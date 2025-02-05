@@ -2,6 +2,7 @@ package com.example.ordersystem.product.domain;
 
 import com.example.ordersystem.common.domain.BaseTimeEntity;
 import com.example.ordersystem.member.domain.Member;
+import com.example.ordersystem.product.dto.ProductResDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,4 +25,15 @@ public class Product extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public ProductResDto resDtoFromEntity(){
+        return ProductResDto.builder()
+                .id(this.id)
+                .name(this.name)
+                .category(this.category)
+                .price(this.price)
+                .stockQuantity(this.stockQuantity)
+                .imagePath(this.imagePath)
+                .build();
+    }
 }

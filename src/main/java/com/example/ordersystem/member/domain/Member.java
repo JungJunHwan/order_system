@@ -33,7 +33,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Ordering> orderingList;
 
-    public MemberResDto listResDtoFromEntity(){
+    public MemberResDto resDtoFromEntity(){
         return MemberResDto.builder()
                 .id(this.id)
                 .name(this.name)

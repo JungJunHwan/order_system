@@ -6,6 +6,8 @@ import com.example.ordersystem.member.dto.MemberResDto;
 import com.example.ordersystem.member.dto.MemberSaveReqDto;
 import com.example.ordersystem.member.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +31,7 @@ public class MemberService {
     }
 
     public List<MemberResDto> findAll(){
-        return memberRepository.findAll().stream().map(a->a.listResDtoFromEntity()).toList();
+        return memberRepository.findAll().stream().map(a->a.resDtoFromEntity()).toList();
     }
 
     public Member login(LoginDto loginDto){
@@ -40,5 +42,12 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         return member;
+    }
+
+    public MemberResDto myInfo(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Member member = memberRepository.findByEmail(email).orElseThrow(()->new EntityNotFoundException("없는 사용자입니다"));
+        return member.resDtoFromEntity();
     }
 }
