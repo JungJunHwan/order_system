@@ -38,7 +38,7 @@ public class SecurityConfig {
 //                토큰을 검증하고, 토큰을 통해 Authentication 객체를 생성
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 //                .authenticated() : 모든 요청에 대해서 Authentication 객체가 생성되기를 요구
-                .authorizeHttpRequests(a -> a.requestMatchers("/member/create", "member/doLogin")
+                .authorizeHttpRequests(a -> a.requestMatchers("/member/create", "member/doLogin", "product/list")
                         .permitAll().anyRequest().authenticated())
                 .build();
     }

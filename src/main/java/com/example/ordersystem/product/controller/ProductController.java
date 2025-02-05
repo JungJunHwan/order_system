@@ -3,7 +3,10 @@ package com.example.ordersystem.product.controller;
 import com.example.ordersystem.product.domain.Product;
 import com.example.ordersystem.product.dto.ProductRegisterDto;
 import com.example.ordersystem.product.dto.ProductResDto;
+import com.example.ordersystem.product.dto.ProductSearchDto;
 import com.example.ordersystem.product.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,13 +23,14 @@ public class ProductController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> productCreate(@RequestBody ProductRegisterDto productRegisterDto){
+    public ResponseEntity<?> productCreate(ProductRegisterDto productRegisterDto){
         Product product = productService.productCreate(productRegisterDto);
         return new ResponseEntity<>(product.getId(), HttpStatus.CREATED);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> productList(){
-
+    public ResponseEntity<?> productList(Pageable pageable, ProductSearchDto productSearchDto){
+        Page<ProductResDto> productResDtos = productService.findAll(pageable, productSearchDto);
+        return new ResponseEntity<>(productResDtos, HttpStatus.OK);
     }
 }
