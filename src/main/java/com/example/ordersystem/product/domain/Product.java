@@ -40,4 +40,12 @@ public class Product extends BaseTimeEntity {
     public void updateImagePath(String imagePath){
         this.imagePath = imagePath;
     }
+
+    public void updateStockQuantity(Integer stockQuantity){
+        this.stockQuantity = this.stockQuantity - stockQuantity;
+    }
+
+    public void cancelOrder(Integer stockQuantity){
+        this.stockQuantity = this.stockQuantity + stockQuantity;
+    }
 }

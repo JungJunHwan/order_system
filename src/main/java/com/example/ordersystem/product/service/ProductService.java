@@ -8,10 +8,15 @@ import com.example.ordersystem.product.dto.ProductResDto;
 import com.example.ordersystem.product.dto.ProductSearchDto;
 import com.example.ordersystem.product.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,6 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -74,6 +81,26 @@ public class ProductService {
     }
 
     public Page<ProductResDto> findAll(Pageable pageable, ProductSearchDto productSearchDto){
+        Specification<Product> specification = new Specification<Product>() {
+            @Override
+            public Predicate toPredicate(Root<Product> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<>();
+                if(productSearchDto.getCategory() != null){
+                    predicates.add(criteriaBuilder.equal(root.get("category"), productSearchDto.getCategory()));
+                }
+                if(productSearchDto.getProductName() != null){
+                    predicates.add(criteriaBuilder.like(root.get("name"),"%"+productSearchDto.getProductName()+"%"));
+                }
+                Predicate[] predicateArr = new Predicate[predicates.size()];
+                for (int i = 0; i < predicates.size(); i++) {
+                    predicateArr[i] = predicates.get(i);
+                }
+                Predicate predicate = criteriaBuilder.and(predicateArr);
+                return predicate;
+            }
+        };
 
+        Page<Product> productList = productRepository.findAll(specification, pageable);
+        return productList.map(p->p.resDtoFromEntity());
     }
 }
